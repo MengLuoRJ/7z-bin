@@ -1,2 +1,2 @@
-import{join as r}from"path";function e(){return process.env.USE_SYSTEM_7ZA==="true"?"7z":process.platform==="darwin"?r(__dirname,"lib","mac",process.arch,"7z"):process.platform==="win32"?r(__dirname,"lib","win",process.arch,"7z.exe"):r(__dirname,"lib","linux",process.arch,"7z")}var t=e(),i=r(__dirname,"7x.sh");export{i as path7x,t as path7z};
+import{join as r}from"path";function t(){if(process.env.USE_SYSTEM_7ZA==="true")return"7z";let e=r(__dirname,"..","bin");return process.platform==="win32"?r(e,"win",process.arch,"7z.exe"):process.platform==="darwin"?r(e,"mac","7zz"):r(e,"linux",process.arch,"7zz")}var s=t(),o=r(__dirname,"7x.sh");export{o as path7x,s as path7z};
 //# sourceMappingURL=index.mjs.map

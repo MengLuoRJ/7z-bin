@@ -1,9 +1,12 @@
 {
   "name": "7z-bin",
   "description": "7-Zip precompiled full binaries",
-  "version": "0.0.1-dev",
+  "version": "0.0.2-dev",
   "license": "MIT",
-  "repository": "mengluorj/7z-bin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mengluorj/7z-bin.git"
+  },
   "keywords": [
     "7zip",
     "7z"
@@ -22,7 +25,7 @@
   "types": "./dist/index.d.ts",
   "module": "./dist/index.mjs",
   "files": [
-    "lib",
+    "bin",
     "dist"
   ]
 }

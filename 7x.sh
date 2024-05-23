@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sz_program=${SZA_PATH:-7za}
+sz_program=${SZA_PATH:-7z}
 sz_type=${SZA_ARCHIVE_TYPE:-xz}
 
 case $1 in

@@ -1,0 +1,28 @@
+{
+  "name": "7z-bin",
+  "description": "7-Zip precompiled full binaries",
+  "version": "0.0.1-dev",
+  "license": "MIT",
+  "repository": "mengluorj/7z-bin",
+  "keywords": [
+    "7zip",
+    "7z"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "build": "tsup",
+    "watch": "npm run build -- --watch src",
+    "prepublish": "npm run build"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "files": [
+    "lib",
+    "dist"
+  ]
+}

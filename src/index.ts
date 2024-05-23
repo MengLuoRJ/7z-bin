@@ -7,12 +7,14 @@ function getPath() {
     return "7z";
   }
 
-  if (process.platform === "darwin") {
-    return join(__dirname, "lib", "mac", "7zz");
-  } else if (process.platform === "win32") {
-    return join(__dirname, "lib", "win", process.arch, "7z.exe");
+  const bin = join(__dirname, "..", "bin");
+
+  if (process.platform === "win32") {
+    return join(bin, "win", process.arch, "7z.exe");
+  } else if (process.platform === "darwin") {
+    return join(bin, "mac", "7zz");
   } else {
-    return join(__dirname, "lib", "linux", process.arch, "7zz");
+    return join(bin, "linux", process.arch, "7zz");
   }
 }
 

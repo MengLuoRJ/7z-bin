@@ -1,1 +1,1 @@
-7-Zip precompiled binaries.
+7-Zip full feature precompiled binaries

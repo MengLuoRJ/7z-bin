@@ -9,7 +9,8 @@
   },
   "keywords": [
     "7zip",
-    "7z"
+    "7z",
+    "7zz"
   ],
   "devDependencies": {
     "@types/node": "^20.16.10",

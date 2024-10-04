@@ -14,7 +14,7 @@ function getPath() {
   } else if (process.platform === "darwin") {
     return join(bin, "mac", "7zz");
   } else {
-    return join(bin, "linux", process.arch, "7zz");
+    return join(bin, "linux", process.arch, "7zzs");
   }
 }
 

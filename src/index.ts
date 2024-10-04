@@ -3,7 +3,7 @@
 import { join } from "path";
 
 function getPath() {
-  if (process.env.USE_SYSTEM_7ZA === "true") {
+  if (process.env.USE_SYSTEM_7Z === "true") {
     return "7z";
   }
 

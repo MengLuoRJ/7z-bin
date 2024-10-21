@@ -4,6 +4,11 @@
 
 As this package will contain `7z.exe`, `7z.dll` and `7zz`, it means its size is larger than any other packages containing `7za`, please refer to the [Defferences](#differences-between-7zz-and-7za) section below before using, to consider to choose this package or other packages like [`7zip-bin`](https://github.com/develar/7zip-bin) within smaller size `7za` binaries.
 
+## Environment Variables
+
+- `USE_SYSTEM_7Z`: set to use `7z` from current system instead of the binaries in this packages.
+- `SZ_COMPRESSION_LEVEL`: set the compression level for 7z archive. The default value is `9`.
+
 ## Package Version
 
 | `7z-bin` package version | `7-Zip` binaries veriosn |
@@ -34,3 +39,11 @@ Supported formats:
 
 - Packing / unpacking: 7z, xz, ZIP, GZIP, BZIP2 and TAR
 - Unpacking only: lzma, CAB, ZSTD.
+
+## License
+
+This repository is licensed under the [MIT License](LICENSE).
+
+This repository was forked from [7zip-bin](https://github.com/develar/7zip-bin), licensed under the [MIT License](https://github.com/develar/7zip-bin/blob/master/LICENSE.txt).
+
+This repository contains 7-Zip binaries from [7-Zip](https://www.7-zip.org/), licensed under [7-Zip License for use and distribution](https://www.7-zip.org/license.txt)

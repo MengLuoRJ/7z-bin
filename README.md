@@ -13,7 +13,7 @@ As this package will contain `7z.exe`, `7z.dll` and `7zz`, it means its size is 
 
 | `7z-bin` package version | `7-Zip` binaries veriosn |
 | :----------------------- | :----------------------- |
-| 7z-bin@0.0.5             | 7-Zip@24.09 (2024-11-29) |
+| 7z-bin@0.0.8            | 7-Zip@24.09 (2024-11-29) |
 | 7z-bin@0.0.3             | 7-Zip@24.08 (2024-08-11) |
 | 7z-bin@0.0.2             | 7-Zip@24.05 (2024-05-14) |
 

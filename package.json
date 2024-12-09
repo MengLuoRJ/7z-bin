@@ -1,7 +1,7 @@
 {
   "name": "7z-bin",
   "description": "7-Zip full feature precompiled binaries",
-  "version": "0.0.5",
+  "version": "0.0.8",
   "license": "MIT",
   "repository": {
     "type": "git",

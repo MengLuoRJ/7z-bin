@@ -74,52 +74,11 @@ historical rows; rerunning an existing version does not add a duplicate row.
 The package.json change is included in the update PR. It does not publish to
 npm; publish the package separately after reviewing and merging the update.
 
-Enable **Allow GitHub Actions to create and approve pull requests** in the
-repository's Actions settings. The workflow requires `contents: write` and
-`pull-requests: write`; organization policies may restrict these permissions.
-PRs created using the built-in `GITHUB_TOKEN` do not trigger ordinary
-`pull_request` workflows, so validation is performed inside this workflow.
-
 Run updater unit tests with `node --test scripts/update-bin.test.mjs`.
 The updater itself is intended for this Ubuntu workflow and requires `tar`,
 xz support and a 7-Zip extractor. The workflow detects `7zz` or `7z` after
 installation and passes its absolute path through `SEVEN_ZIP`; the script
 otherwise defaults to `7zz`.
-
-## Manual npm publishing
-
-The **Publish to npm** workflow (`publish-npm.yml`) is manual-only and runs only
-when the selected branch is the repository's default branch. Merge the binary
-update PR first, then open Actions → Publish to npm → Run workflow. The version
-is read directly from the checked-out package.json; no version input is needed.
-Leave `dry_run` enabled for a trial (nothing is uploaded); run again with it
-disabled to upload the package using `npm stage publish`. This does not release
-the version publicly. Review it in the **Staged Packages** tab on npmjs.com,
-then approve with 2FA to publish under the `latest` tag. Alternatively, review
-using `npm stage list` / `npm stage view <stage-id>` and approve using
-`npm stage approve <stage-id>` on your own authenticated machine.
-The workflow never approves staged packages, changes the package version or
-republishes an already published npm version.
-
-Configure npm Trusted Publishing for the existing `7z-bin` package on npmjs.com:
-
-- Provider: GitHub Actions
-- Organization or user: `MengLuoRJ`
-- Repository: `7z-bin`
-- Workflow filename: `publish-npm.yml`
-- Environment: leave empty (this workflow does not use a GitHub Environment)
-- Allowed actions: leave direct publishing and dist-tag management unchecked;
-  the default `npm stage publish` permission is sufficient.
-
-The workflow uses npm 11 and `id-token: write` for OIDC authentication; do not
-add NPM_TOKEN or NODE_AUTH_TOKEN. It tests and builds the package, checks its
-ESM/CJS entries and Linux binary, validates package.json against the bundled
-version metadata and file hashes, and packs a tarball before staging that exact
-archive with provenance. Dry-run uses `npm publish --dry-run` only for local
-validation and does not need direct publishing permission or verify OIDC
-authorization. Uploading requires a valid Trusted Publisher configuration and
-an unpublished version. See [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/)
-and [staged publishing](https://docs.npmjs.com/staged-publishing/).
 
 ## License
 

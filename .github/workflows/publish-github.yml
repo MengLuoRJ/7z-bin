@@ -1,0 +1,51 @@
+name: Publish to GitHub Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Validate and pack without publishing to GitHub Packages"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-github-packages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://npm.pkg.github.com
+          scope: '@mengluorj'
+
+      - name: Install build dependencies
+        run: |
+          npm install --global pnpm@9.15.9
+          pnpm install --frozen-lockfile
+
+      - name: Test and build
+        run: |
+          node --test scripts/update-bin.test.mjs scripts/publish-github.test.mjs
+          pnpm run build
+
+      - name: Verify bundled binary and package entries
+        run: |
+          VERSION="$(node --input-type=module -e 'import { readFileSync } from "node:fs"; console.log(JSON.parse(readFileSync("bin/version.json", "utf8")).version)')" node scripts/verify-package.mjs
+
+      - name: Publish isolated scoped package
+        run: node scripts/publish-github.mjs
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ inputs.dry_run }}

@@ -56,8 +56,7 @@ jobs:
         if: steps.update.outputs.changed == 'true'
         run: |
           pnpm run build
-          node --input-type=module -e 'import { existsSync } from "node:fs"; import { execFileSync } from "node:child_process"; import { path7z, path7x } from "./dist/index.mjs"; if (!existsSync(path7z) || !existsSync(path7x)) throw new Error("Missing package files"); const output = execFileSync(path7z, [], { encoding: "utf8" }); if (!output.includes("7-Zip " + process.env.VERSION)) throw new Error("Binary version mismatch");'
-          node -e 'const { existsSync } = require("node:fs"); const { path7z, path7x } = require("./dist/index.cjs"); if (!existsSync(path7z) || !existsSync(path7x)) throw new Error("Missing CJS package files");'
+          node scripts/verify-package.mjs
         env:
           VERSION: ${{ steps.update.outputs.version }}
 

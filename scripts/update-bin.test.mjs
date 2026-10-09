@@ -5,6 +5,21 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { TARGETS, planRelease, verifyAsset, updateBinaries } from "./update-bin.mjs";
 
+import { verifyBinaryVersion } from "./verify-package.mjs";
+
+test("version check accepts Linux and Windows banners and rejects mismatches", () => {
+  for (const banner of [
+    "\n7-Zip (z) 26.04 (x64) : Copyright (c) 1999-2026 Igor Pavlov\n",
+    "\n7-Zip 26.04 (x64) : Copyright (c) 1999-2026 Igor Pavlov\n",
+  ]) {
+    assert.doesNotThrow(() => verifyBinaryVersion(banner, "26.04", "binary"));
+    assert.throws(() => verifyBinaryVersion(banner, "25.01", "binary"), /Binary version mismatch/);
+  }
+  assert.throws(() => verifyBinaryVersion("7-Zip (z) 26.040 (x64)", "26.04", "binary"));
+  assert.throws(() => verifyBinaryVersion("unrecognized header", "26.04", "binary"));
+  assert.throws(() => verifyBinaryVersion("7-Zip 26.04", undefined, "binary"));
+});
+
 const names = ["7z2604-x64.exe", "7z2604.exe", "7z2604-arm64.exe", "7z2604-arm.exe",
   "7z2604-mac.tar.xz", ...["x64", "x86", "arm64", "arm"].map((arch) => `7z2604-linux-${arch}.tar.xz`)];
 const release = () => ({ tag_name: "26.04", assets: names.map((name) => ({ name, size: 4,

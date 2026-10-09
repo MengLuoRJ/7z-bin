@@ -1,2 +1,1 @@
-import{join as r}from"path";function t(){if(process.env.USE_SYSTEM_7Z==="true")return"7z";let e=r(__dirname,"..","bin");return process.platform==="win32"?r(e,"win",process.arch,"7z.exe"):process.platform==="darwin"?r(e,"mac","7zz"):r(e,"linux",process.arch,"7zzs")}var s=t(),o=r(__dirname,"7x.sh");export{o as path7x,s as path7z};
-//# sourceMappingURL=index.mjs.map
+import{join as e}from"node:path";function t(){if(process.env.USE_SYSTEM_7Z===`true`)return`7z`;let t=e(import.meta.dirname,`..`,`bin`);return process.platform===`win32`?e(t,`win`,process.arch,`7z.exe`):process.platform===`darwin`?e(t,`mac`,process.arch,`7zz`):e(t,`linux`,process.arch,`7zzs`)}const n=t(),r=e(import.meta.dirname,`7x.sh`);export{r as path7x,n as path7z};

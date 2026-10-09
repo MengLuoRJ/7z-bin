@@ -1,0 +1,83 @@
+name: Update 7-Zip binaries
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-7z-binaries
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Test updater
+        run: node --test scripts/update-bin.test.mjs
+
+      - name: Install archive tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y 7zip xz-utils
+          7zz i
+
+      - name: Update binaries
+        id: update
+        run: node scripts/update-bin.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SEVEN_ZIP: 7zz
+
+      - name: Install build dependencies
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          npm install --global pnpm@9.15.9
+          pnpm install --frozen-lockfile
+
+      - name: Build and verify package
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          pnpm run build
+          node --input-type=module -e 'import { existsSync } from "node:fs"; import { execFileSync } from "node:child_process"; import { path7z, path7x } from "./dist/index.mjs"; if (!existsSync(path7z) || !existsSync(path7x)) throw new Error("Missing package files"); const output = execFileSync(path7z, [], { encoding: "utf8" }); if (!output.includes("7-Zip " + process.env.VERSION)) throw new Error("Binary version mismatch");'
+          node -e 'const { existsSync } = require("node:fs"); const { path7z, path7x } = require("./dist/index.cjs"); if (!existsSync(path7z) || !existsSync(path7x)) throw new Error("Missing CJS package files");'
+        env:
+          VERSION: ${{ steps.update.outputs.version }}
+
+      - name: Create or update binary update PR
+        if: steps.update.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ github.token }}
+          base: ${{ github.event.repository.default_branch }}
+          branch: automation/update-7zip
+          delete-branch: true
+          add-paths: |
+            bin/
+            dist/
+            README.md
+          commit-message: |
+            chore: update 7-Zip binaries to ${{ steps.update.outputs.version }}
+
+            Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+          title: "chore: update 7-Zip binaries to ${{ steps.update.outputs.version }}"
+          body: |
+            Update all bundled Windows, macOS and Linux binaries to **${{ steps.update.outputs.version }}** (${{ steps.update.outputs.date }}).
+
+            Upstream release: ${{ steps.update.outputs.releaseUrl }}
+
+            All required assets and files were validated before installation. Asset and extracted file SHA-256 hashes are recorded in `bin/version.json`.
+            The package was rebuilt and the Linux x64 binary and ESM/CJS entry points were checked.

@@ -9,7 +9,6 @@ const root = join(import.meta.dirname, "..");
 const pkg = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 const manifest = JSON.parse(await readFile(join(root, "bin", "version.json"), "utf8"));
 assert.equal(pkg.name, "7z-bin", "Unexpected package name");
-assert.equal(pkg.version, process.env.EXPECTED_VERSION, "Requested version does not match package.json");
 assert.equal(pkg.version, getPackageVersion(manifest.version), "Package and bundled 7-Zip versions differ");
 assert.equal(manifest.packageVersion, pkg.version, "Binary manifest package version differs");
 assert.ok(["true", "false"].includes(process.env.DRY_RUN), "DRY_RUN must be true or false");
@@ -31,10 +30,14 @@ try {
   for (const name of files) {
     assert.ok(!/^bin\/.*\/(?:History\.txt|readme\.txt)$/i.test(name), `Unexpected bundled document: ${name}`);
   }
-  console.log(`Publishing ${pkg.name}@${pkg.version}; dry-run=${process.env.DRY_RUN}; archive=${pack.filename}`);
-  const args = ["publish", archive, "--access", "public", "--tag", "latest", "--ignore-scripts", "--registry", "https://registry.npmjs.org"];
-  args.push(process.env.DRY_RUN === "true" ? "--dry-run" : "--provenance");
+  const dryRun = process.env.DRY_RUN === "true";
+  console.log(`${dryRun ? "Validating" : "Staging"} ${pkg.name}@${pkg.version}; archive=${pack.filename}`);
+  const args = dryRun ? ["publish", archive, "--dry-run"] : ["stage", "publish", archive, "--provenance"];
+  args.push("--access", "public", "--tag", "latest", "--ignore-scripts", "--registry", "https://registry.npmjs.org");
   console.log(run(args));
+  console.log(dryRun
+    ? "Dry-run complete. No package was uploaded."
+    : "Package staged, not publicly released. Review it in npm Staged Packages and approve with 2FA.");
 } finally {
   await rm(archive, { force: true });
 }

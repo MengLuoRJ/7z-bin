@@ -90,10 +90,16 @@ otherwise defaults to `7zz`.
 
 The **Publish to npm** workflow (`publish-npm.yml`) is manual-only and runs only
 when the selected branch is the repository's default branch. Merge the binary
-update PR first, then open Actions → Publish to npm → Run workflow. Enter the
-exact package.json version (for example `26.4.0`). Leave `dry_run` enabled for a
-trial; run again with it disabled to publish publicly under the `latest` tag.
-It never changes the package version and npm versions cannot be republished.
+update PR first, then open Actions → Publish to npm → Run workflow. The version
+is read directly from the checked-out package.json; no version input is needed.
+Leave `dry_run` enabled for a trial (nothing is uploaded); run again with it
+disabled to upload the package using `npm stage publish`. This does not release
+the version publicly. Review it in the **Staged Packages** tab on npmjs.com,
+then approve with 2FA to publish under the `latest` tag. Alternatively, review
+using `npm stage list` / `npm stage view <stage-id>` and approve using
+`npm stage approve <stage-id>` on your own authenticated machine.
+The workflow never approves staged packages, changes the package version or
+republishes an already published npm version.
 
 Configure npm Trusted Publishing for the existing `7z-bin` package on npmjs.com:
 
@@ -102,14 +108,18 @@ Configure npm Trusted Publishing for the existing `7z-bin` package on npmjs.com:
 - Repository: `7z-bin`
 - Workflow filename: `publish-npm.yml`
 - Environment: leave empty (this workflow does not use a GitHub Environment)
+- Allowed actions: leave direct publishing and dist-tag management unchecked;
+  the default `npm stage publish` permission is sufficient.
 
 The workflow uses npm 11 and `id-token: write` for OIDC authentication; do not
 add NPM_TOKEN or NODE_AUTH_TOKEN. It tests and builds the package, checks its
-ESM/CJS entries and Linux binary, validates the requested version and bundled
-file hashes, and packs a tarball before publishing that exact archive with
-provenance. A dry-run does not verify the npm publisher authorization, and an
-actual publish still requires a valid Trusted Publisher configuration and an
-unpublished version. See the [npm Trusted Publishing documentation](https://docs.npmjs.com/trusted-publishers/).
+ESM/CJS entries and Linux binary, validates package.json against the bundled
+version metadata and file hashes, and packs a tarball before staging that exact
+archive with provenance. Dry-run uses `npm publish --dry-run` only for local
+validation and does not need direct publishing permission or verify OIDC
+authorization. Uploading requires a valid Trusted Publisher configuration and
+an unpublished version. See [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/)
+and [staged publishing](https://docs.npmjs.com/staged-publishing/).
 
 ## License
 

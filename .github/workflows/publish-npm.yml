@@ -3,12 +3,8 @@ name: Publish to npm
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: "Exact package.json version to publish (for example 26.4.0)"
-        required: true
-        type: string
       dry_run:
-        description: "Validate and pack without publishing"
+        description: "Validate and pack without uploading to npm staging"
         type: boolean
         default: true
 
@@ -47,8 +43,7 @@ jobs:
         run: |
           VERSION="$(node --input-type=module -e 'import { readFileSync } from "node:fs"; console.log(JSON.parse(readFileSync("bin/version.json", "utf8")).version)')" node scripts/verify-package.mjs
 
-      - name: Pack and publish with npm trusted publishing
+      - name: Pack and stage with npm trusted publishing
         run: node scripts/publish-npm.mjs
         env:
-          EXPECTED_VERSION: ${{ inputs.version }}
           DRY_RUN: ${{ inputs.dry_run }}

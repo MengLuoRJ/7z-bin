@@ -12,12 +12,12 @@ const source = (await readFile(new URL("./publish-npm.mjs", import.meta.url), "u
 const execute = new (Object.getPrototypeOf(async function() {}).constructor)(
   "assert", "execFileSync", "readFile", "rm", "join", "getPackageVersion", "createHash", "root", "process", source);
 
-for (const scenario of ["dry-run", "publish", "wrong-version", "corrupt-file"]) {
+for (const scenario of ["dry-run", "stage", "wrong-version", "corrupt-file"]) {
   test(`publish script: ${scenario}`, async () => {
     const root = await mkdtemp(join(tmpdir(), "7z-publish-test-"));
     try {
       await mkdir(join(root, "bin"));
-      await writeFile(join(root, "package.json"), JSON.stringify({ name: "7z-bin", version: "26.4.0" }));
+      await writeFile(join(root, "package.json"), JSON.stringify({ name: "7z-bin", version: scenario === "wrong-version" ? "26.5.0" : "26.4.0" }));
       await writeFile(join(root, "bin", "file"), scenario === "corrupt-file" ? "corrupt" : "data");
       await writeFile(join(root, "bin", "version.json"), JSON.stringify({ version: "26.04", packageVersion: "26.4.0",
         files: [{ path: "file", sha256: createHash("sha256").update("data").digest("hex") }] }));
@@ -30,7 +30,7 @@ for (const scenario of ["dry-run", "publish", "wrong-version", "corrupt-file"]) 
         return "mock publish succeeded";
       };
       const promise = execute(assert, npm, readFile, rm, join, getPackageVersion, createHash, root, { env: {
-        EXPECTED_VERSION: scenario === "wrong-version" ? "26.5.0" : "26.4.0", DRY_RUN: scenario === "publish" ? "false" : "true",
+        DRY_RUN: scenario === "stage" ? "false" : "true",
       } });
       if (["wrong-version", "corrupt-file"].includes(scenario)) {
         await assert.rejects(promise);
@@ -38,8 +38,13 @@ for (const scenario of ["dry-run", "publish", "wrong-version", "corrupt-file"]) 
       } else {
         await promise;
         assert.equal(calls.length, 2);
-        assert.ok(calls[1].includes(scenario === "publish" ? "--provenance" : "--dry-run"));
-        assert.equal(calls[1][1], join(root, "7z-bin-26.4.0.tgz"));
+        if (scenario === "stage") {
+          assert.deepEqual(calls[1].slice(0, 3), ["stage", "publish", join(root, "7z-bin-26.4.0.tgz")]);
+          assert.ok(calls[1].includes("--provenance"));
+          assert.ok(!calls[1].includes("--dry-run"));
+        } else {
+          assert.deepEqual(calls[1].slice(0, 3), ["publish", join(root, "7z-bin-26.4.0.tgz"), "--dry-run"]);
+        }
       }
     } finally { await rm(root, { recursive: true, force: true }); }
   });

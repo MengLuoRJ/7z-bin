@@ -55,15 +55,21 @@ stable release from [ip7z/7zip](https://github.com/ip7z/7zip/releases). All ten
 Windows, macOS and Linux architecture targets must be present. The macOS
 universal archive is downloaded once and installed in both architecture folders.
 Each archive's size and upstream SHA-256 digest (when provided) are checked, and
-all mapped binaries and documents must be nonempty regular files before any
-repository files are updated. Release dates come from the bundled History.txt.
+all mapped binaries and License.txt files must be nonempty regular files before
+any repository files are updated. History.txt and readme.txt are not extracted
+or retained; previously installed copies are removed. Archives still need to be
+downloaded in full. Dates in the version metadata and table are GitHub Release
+publication dates, not necessarily the upstream software's release dates.
 
 The updater compares file contents, restores Unix executable permissions and
 records asset/file SHA-256 hashes in `bin/version.json`. Every run revalidates
 the assets and repairs incomplete installations, even for an unchanged version.
 The workflow rebuilds `dist` and checks the Linux x64 binary and both package
-entry points before creating the PR. It does not bump the npm package version or
-publish to npm; release the package separately after reviewing the update.
+entry points before creating the PR. It synchronizes package.json and the README
+package version with the upstream version: `26.04` becomes `26.4.0` (the two
+upstream components become semver major/minor and patch is set to zero).
+The package.json change is included in the update PR. It does not publish to
+npm; publish the package separately after reviewing and merging the update.
 
 Enable **Allow GitHub Actions to create and approve pull requests** in the
 repository's Actions settings. The workflow requires `contents: write` and

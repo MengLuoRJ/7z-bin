@@ -9,7 +9,7 @@ import { promisify } from "node:util";
 const exec = promisify(execFile);
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const REPOSITORY = "ip7z/7zip";
-const DOCUMENTS = ["History.txt", "License.txt", "readme.txt"];
+const DOCUMENTS = ["License.txt"];
 const sha256 = (buffer) => createHash("sha256").update(buffer).digest("hex");
 
 export const TARGETS = [
@@ -106,14 +106,18 @@ export async function collectFiles(directory, target) {
   return files;
 }
 
-export function getReleaseDate(files, version) {
-  const dates = files.filter((file) => file.path.endsWith("/History.txt")).map((file) => {
-    const match = file.content.toString("utf8").match(new RegExp(`^${version.replace(".", "\\.")}\\s+(\\d{4}-\\d{2}-\\d{2})(?:\\s|$)`, "m"));
-    if (!match) throw new Error(`Release date not found: ${file.path}`);
-    return match[1];
-  });
-  if (dates.length !== TARGETS.length || new Set(dates).size !== 1) throw new Error("Inconsistent release dates");
-  return dates[0];
+export function getPackageVersion(version) {
+  if (!/^\d{2}\.\d{2}$/.test(version)) throw new Error("Expected a YY.NN release version");
+  return version.split(".").map(Number).join(".") + ".0";
+}
+
+export function getReleaseDate(release) {
+  if (typeof release.published_at !== "string" ||
+      !/^\d{4}-\d{2}-\d{2}T/.test(release.published_at) ||
+      !Number.isFinite(Date.parse(release.published_at))) {
+    throw new Error("Invalid GitHub Release publication date");
+  }
+  return new Date(release.published_at).toISOString().slice(0, 10);
 }
 
 export async function writeIfChanged(path, content, executable = false) {
@@ -139,13 +143,20 @@ export async function writeIfChanged(path, content, executable = false) {
 }
 
 export function updateReadme(content, version, date) {
-  const pattern = /^(\| 7z-bin@[^|\r\n]+\|\s*)7-Zip@[^|\r\n]+(\|)/m;
+  const pattern = /^\| 7z-bin@[^|\r\n]+\|\s*7-Zip@[^|\r\n]+\|/m;
   if (!pattern.test(content)) throw new Error("README package version table was not found");
-  return content.replace(pattern, (_, lead, tail) => `${lead}7-Zip@${version} (${date}) ${tail}`);
+  return content.replace(pattern, `| 7z-bin@${getPackageVersion(version)} | 7-Zip@${version} (${date}) |`);
 }
 
 export async function updateBinaries({ root = ROOT, release, download = request, extract = extractArchive } = {}) {
   const plan = planRelease(release);
+  const date = getReleaseDate(release);
+  const packageVersion = getPackageVersion(release.tag_name);
+  const packagePath = join(root, "package.json");
+  const packageContent = await readFile(packagePath, "utf8");
+  const pkg = JSON.parse(packageContent);
+  pkg.version = packageVersion;
+  const nextPackageContent = JSON.stringify(pkg, null, 2) + "\n";
   const work = await mkdtemp(join(tmpdir(), "7z-bin-update-"));
   try {
     const files = [];
@@ -165,11 +176,11 @@ export async function updateBinaries({ root = ROOT, release, download = request,
       }
       files.push(...await collectFiles(cached.directory, target));
     }
-    const date = getReleaseDate(files, release.tag_name);
     const readmePath = join(root, "README.md");
     const readme = updateReadme(await readFile(readmePath, "utf8"), release.tag_name, date);
     const manifest = {
       version: release.tag_name,
+      packageVersion,
       date,
       releaseUrl: `https://github.com/${REPOSITORY}/releases/tag/${release.tag_name}`,
       assets: [...assets].map(([name, { digest }]) => ({ name, sha256: digest })),
@@ -180,7 +191,8 @@ export async function updateBinaries({ root = ROOT, release, download = request,
     for (const file of files) {
       changed = await writeIfChanged(join(root, "bin", file.path), file.content, file.executable) || changed;
     }
-    for (const legacy of ["mac/7zz", "mac/License.txt", "linux/License.txt", "win/License.txt"]) {
+    for (const legacy of ["mac/7zz", "mac/License.txt", "linux/License.txt", "win/License.txt",
+      ...TARGETS.flatMap((target) => ["History.txt", "readme.txt"].map((name) => `${target.directory}/${name}`))]) {
       const path = join(root, "bin", legacy);
       try {
         await lstat(path);
@@ -190,9 +202,12 @@ export async function updateBinaries({ root = ROOT, release, download = request,
         if (error.code !== "ENOENT") throw error;
       }
     }
+    if (JSON.parse(packageContent).version !== packageVersion) {
+      changed = await writeIfChanged(packagePath, Buffer.from(nextPackageContent)) || changed;
+    }
     changed = await writeIfChanged(readmePath, Buffer.from(readme)) || changed;
     changed = await writeIfChanged(join(root, "bin", "version.json"), Buffer.from(JSON.stringify(manifest, null, 2) + "\n")) || changed;
-    return { changed, version: release.tag_name, date, releaseUrl: manifest.releaseUrl };
+    return { changed, version: release.tag_name, packageVersion, date, releaseUrl: manifest.releaseUrl };
   } finally {
     await rm(work, { recursive: true, force: true });
   }

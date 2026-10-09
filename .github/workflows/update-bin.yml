@@ -72,6 +72,7 @@ jobs:
             bin/
             dist/
             README.md
+            package.json
           commit-message: |
             chore: update 7-Zip binaries to ${{ steps.update.outputs.version }}
 
@@ -79,6 +80,9 @@ jobs:
           title: "chore: update 7-Zip binaries to ${{ steps.update.outputs.version }}"
           body: |
             Update all bundled Windows, macOS and Linux binaries to **${{ steps.update.outputs.version }}** (${{ steps.update.outputs.date }}).
+
+            npm package version: **${{ steps.update.outputs.packageVersion }}**.
+            The date above is the GitHub Release publication date.
 
             Upstream release: ${{ steps.update.outputs.releaseUrl }}
 

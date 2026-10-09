@@ -1,0 +1,158 @@
+{
+  "version": "26.04",
+  "packageVersion": "26.4.0",
+  "date": "2026-10-06",
+  "releaseUrl": "https://github.com/ip7z/7zip/releases/tag/26.04",
+  "assets": [
+    {
+      "name": "7z2604-x64.exe",
+      "sha256": "d54bf805f9f3704d1e8db2fa3498ae7ef2df0312b40b558e7c71c734430a665d"
+    },
+    {
+      "name": "7z2604.exe",
+      "sha256": "39bf65045153fc26c42fa9fe47afd8cd1b11671c7f11d031e738c9a13960c009"
+    },
+    {
+      "name": "7z2604-arm64.exe",
+      "sha256": "d4117b95495b0e925334ae7b5bddf2853513274603de15dee6acf03999fbc09c"
+    },
+    {
+      "name": "7z2604-arm.exe",
+      "sha256": "ffc86444ae1cb2546146ad8b1a839a8bb5f907288fd08d2833add4363ae10465"
+    },
+    {
+      "name": "7z2604-mac.tar.xz",
+      "sha256": "bee04358cbcbc7106273cee0e8d72916db2696c48067a3538c34d8cd6fd16578"
+    },
+    {
+      "name": "7z2604-linux-x64.tar.xz",
+      "sha256": "fc0327ba27e89bd086cf426dff17d77de582953cdbbc10a6576540a06853ffcd"
+    },
+    {
+      "name": "7z2604-linux-x86.tar.xz",
+      "sha256": "6ee3c04dde940b53d62a87f212a54a635e25f8ac5afe8795ed6f6fe3c7cd613a"
+    },
+    {
+      "name": "7z2604-linux-arm64.tar.xz",
+      "sha256": "5b0ac3aa91c1e3499f011d6af69d7f6b4de3ef2f011d9e2ff44c58ebd04aa388"
+    },
+    {
+      "name": "7z2604-linux-arm.tar.xz",
+      "sha256": "9caf5e6942cfcfc50d7c0d7d7effe816f576206a081b78b2eb65c5fa28f076df"
+    }
+  ],
+  "files": [
+    {
+      "path": "win/x64/7z.exe",
+      "sha256": "95fff19b73eff77c87c0d7bd32822e43fb90dd2932459f962eb532d8dfb6ba53"
+    },
+    {
+      "path": "win/x64/7z.dll",
+      "sha256": "899cd73d7fc60e1c1c35c7de0f5bed3dc69bfe2cecbd48014d868a347970a0b1"
+    },
+    {
+      "path": "win/x64/License.txt",
+      "sha256": "519ac0a4bded9c18ea02e0afb71f663d8c47373bd9facd3ac96a79f51d77765d"
+    },
+    {
+      "path": "win/ia32/7z.exe",
+      "sha256": "684955b4978fdbace051ffd55edab90d180b7cb4d208f943998866727d8d6c13"
+    },
+    {
+      "path": "win/ia32/7z.dll",
+      "sha256": "4a796dd5993c7e1188da7610f0d81972cb21b82f28a7c9fb24015ec46b2c0308"
+    },
+    {
+      "path": "win/ia32/License.txt",
+      "sha256": "519ac0a4bded9c18ea02e0afb71f663d8c47373bd9facd3ac96a79f51d77765d"
+    },
+    {
+      "path": "win/arm64/7z.exe",
+      "sha256": "68dc77e7c597644b9f69ae954b3f057bf94ae172472996be438a1ee63ac9cd98"
+    },
+    {
+      "path": "win/arm64/7z.dll",
+      "sha256": "eb84a6eb184c378d84742f372e7501d9a99c34a718ea81d4c71cd62b5a207dee"
+    },
+    {
+      "path": "win/arm64/License.txt",
+      "sha256": "519ac0a4bded9c18ea02e0afb71f663d8c47373bd9facd3ac96a79f51d77765d"
+    },
+    {
+      "path": "win/arm/7z.exe",
+      "sha256": "3651ba280fc2a85360c04a80b66592d2458ce60b110a37ab71db32abb8c7e189"
+    },
+    {
+      "path": "win/arm/7z.dll",
+      "sha256": "40cdf01c026961cd2426122b93bc54f238be528e6ca9c81b8d17c3a8faeca7be"
+    },
+    {
+      "path": "win/arm/License.txt",
+      "sha256": "519ac0a4bded9c18ea02e0afb71f663d8c47373bd9facd3ac96a79f51d77765d"
+    },
+    {
+      "path": "mac/x64/7zz",
+      "sha256": "36ea959367d8f9ac51d47a56dc1f20bfb851f1cd22d6f206e85cb5cbc6ab4577"
+    },
+    {
+      "path": "mac/x64/License.txt",
+      "sha256": "1790374e5352329cedb46ee3808930a88e9ca2f08b82b10fcf5cf605d2c301b1"
+    },
+    {
+      "path": "mac/arm64/7zz",
+      "sha256": "36ea959367d8f9ac51d47a56dc1f20bfb851f1cd22d6f206e85cb5cbc6ab4577"
+    },
+    {
+      "path": "mac/arm64/License.txt",
+      "sha256": "1790374e5352329cedb46ee3808930a88e9ca2f08b82b10fcf5cf605d2c301b1"
+    },
+    {
+      "path": "linux/x64/7zz",
+      "sha256": "d1bc79f00e9815b24048ab167690bdd1dbc387de7dbc47e8d75d68689e49cf4f"
+    },
+    {
+      "path": "linux/x64/7zzs",
+      "sha256": "a6fe7bcdb28e296c53e2c597817b9c6dba00953bf2c68e029489435399585729"
+    },
+    {
+      "path": "linux/x64/License.txt",
+      "sha256": "1790374e5352329cedb46ee3808930a88e9ca2f08b82b10fcf5cf605d2c301b1"
+    },
+    {
+      "path": "linux/ia32/7zz",
+      "sha256": "909a8cad39ed5a5399c310a95680e3ee44980808c4b9ca873213b79fa08903ed"
+    },
+    {
+      "path": "linux/ia32/7zzs",
+      "sha256": "657e5667f72176b40b0a694b2ffa0718563afe9952ab311a635b9e24bccd42d7"
+    },
+    {
+      "path": "linux/ia32/License.txt",
+      "sha256": "1790374e5352329cedb46ee3808930a88e9ca2f08b82b10fcf5cf605d2c301b1"
+    },
+    {
+      "path": "linux/arm64/7zz",
+      "sha256": "a01daa025fcf2dbb76ab40f2854f09b3462d1912add61ee2f4431ce11902d0cd"
+    },
+    {
+      "path": "linux/arm64/7zzs",
+      "sha256": "8f34c72fa4a9a79282b2364308f75d77a928ddf571292a7d030825e53d60e3a7"
+    },
+    {
+      "path": "linux/arm64/License.txt",
+      "sha256": "1790374e5352329cedb46ee3808930a88e9ca2f08b82b10fcf5cf605d2c301b1"
+    },
+    {
+      "path": "linux/arm/7zz",
+      "sha256": "6f40bd4ead26b5c60f1e91326b61a857c73e81bdaa03c430208accf1afc5b1e9"
+    },
+    {
+      "path": "linux/arm/7zzs",
+      "sha256": "8f44eadd4690bff22b06cfabdbe2403bbb77604d52d8ee9bf12fb6752955e722"
+    },
+    {
+      "path": "linux/arm/License.txt",
+      "sha256": "1790374e5352329cedb46ee3808930a88e9ca2f08b82b10fcf5cf605d2c301b1"
+    }
+  ]
+}

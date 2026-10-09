@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mengluorj/7z-bin.git"
+    "url": "https://github.com/MengLuoRJ/7z-bin"
   },
   "keywords": [
     "7zip",

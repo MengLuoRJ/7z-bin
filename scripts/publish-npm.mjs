@@ -9,6 +9,10 @@ const root = join(import.meta.dirname, "..");
 const pkg = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 const manifest = JSON.parse(await readFile(join(root, "bin", "version.json"), "utf8"));
 assert.equal(pkg.name, "7z-bin", "Unexpected package name");
+if (process.env.GITHUB_REPOSITORY) {
+  assert.equal(pkg.repository?.url, `https://github.com/${process.env.GITHUB_REPOSITORY}`,
+    "Repository URL must match the GitHub Actions repository exactly, including case, for npm provenance");
+}
 assert.equal(pkg.version, getPackageVersion(manifest.version), "Package and bundled 7-Zip versions differ");
 assert.equal(manifest.packageVersion, pkg.version, "Binary manifest package version differs");
 assert.ok(["true", "false"].includes(process.env.DRY_RUN), "DRY_RUN must be true or false");

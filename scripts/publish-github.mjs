@@ -25,7 +25,7 @@ export async function preparePackage(root, destination) {
     await cp(join(root, name), join(destination, name), { recursive: true });
   }
   pkg.name = "@mengluorj/7z-bin";
-  pkg.repository = { type: "git", url: "git+https://github.com/MengLuoRJ/7z-bin.git" };
+  pkg.repository = { type: "git", url: "https://github.com/MengLuoRJ/7z-bin" };
   pkg.publishConfig = { registry: "https://npm.pkg.github.com", tag: "latest" };
   delete pkg.scripts;
   await writeFile(join(destination, "package.json"), JSON.stringify(pkg, null, 2) + "\n");

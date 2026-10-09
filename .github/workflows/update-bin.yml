@@ -33,14 +33,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y 7zip xz-utils
-          7zz i
+          SEVEN_ZIP="$(command -v 7zz || command -v 7z)" || {
+            echo "::error::Neither 7zz nor 7z is available after installing 7zip"
+            exit 1
+          }
+          "$SEVEN_ZIP" i
+          echo "SEVEN_ZIP=$SEVEN_ZIP" >> "$GITHUB_ENV"
 
       - name: Update binaries
         id: update
         run: node scripts/update-bin.mjs
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          SEVEN_ZIP: 7zz
 
       - name: Install build dependencies
         if: steps.update.outputs.changed == 'true'

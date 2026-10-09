@@ -72,8 +72,10 @@ PRs created using the built-in `GITHUB_TOKEN` do not trigger ordinary
 `pull_request` workflows, so validation is performed inside this workflow.
 
 Run updater unit tests with `node --test scripts/update-bin.test.mjs`.
-The updater itself is intended for this Ubuntu workflow, requires `7zz`, `tar`
-and xz support, and optionally accepts `SEVEN_ZIP` as the extractor path.
+The updater itself is intended for this Ubuntu workflow and requires `tar`,
+xz support and a 7-Zip extractor. The workflow detects `7zz` or `7z` after
+installation and passes its absolute path through `SEVEN_ZIP`; the script
+otherwise defaults to `7zz`.
 
 ## License
 

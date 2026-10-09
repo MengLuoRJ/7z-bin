@@ -13,7 +13,7 @@ As this package will contain `7z.exe`, `7z.dll` and `7zz`, it means its size is 
 
 | `7z-bin` package version | `7-Zip` binaries veriosn |
 | :----------------------- | :----------------------- |
-| 7z-bin@26.4.0 | 7-Zip@26.04 (2026-10-06) |
+| 7z-bin@26.4.0            | 7-Zip@26.04 (2026-10-06) |
 | 7z-bin@0.0.8             | 7-Zip@24.09 (2024-11-29) |
 | 7z-bin@0.0.3             | 7-Zip@24.08 (2024-08-11) |
 | 7z-bin@0.0.2             | 7-Zip@24.05 (2024-05-14) |
@@ -69,6 +69,8 @@ The workflow rebuilds `dist` and checks the Linux x64 binary and both package
 entry points before creating the PR. It synchronizes package.json and the README
 package version with the upstream version: `26.04` becomes `26.4.0` (the two
 upstream components become semver major/minor and patch is set to zero).
+The README version table prepends each new package version while retaining all
+historical rows; rerunning an existing version does not add a duplicate row.
 The package.json change is included in the update PR. It does not publish to
 npm; publish the package separately after reviewing and merging the update.
 

@@ -143,9 +143,20 @@ export async function writeIfChanged(path, content, executable = false) {
 }
 
 export function updateReadme(content, version, date) {
-  const pattern = /^\| 7z-bin@[^|\r\n]+\|\s*7-Zip@[^|\r\n]+\|/m;
-  if (!pattern.test(content)) throw new Error("README package version table was not found");
-  return content.replace(pattern, `| 7z-bin@${getPackageVersion(version)} | 7-Zip@${version} (${date}) |`);
+  const heading = /^## Package Version[ \t]*\r?\n/m.exec(content);
+  if (!heading) throw new Error("README Package Version section was not found");
+  const start = heading.index + heading[0].length;
+  const rest = content.slice(start);
+  const nextSection = /^#{1,2}[ \t]+/m.exec(rest);
+  const section = rest.slice(0, nextSection?.index ?? rest.length);
+  const rows = [...section.matchAll(/^\|[ \t]*7z-bin@([^|\r\n]+)\|[ \t]*7-Zip@[^|\r\n]+\|[^\r\n]*/gm)];
+  if (!rows.length) throw new Error("README package version table was not found");
+  const packageVersion = getPackageVersion(version);
+  if (rows.some((row) => row[1].trim() === packageVersion)) return content;
+  const position = start + rows[0].index;
+  const newline = heading[0].endsWith("\r\n") ? "\r\n" : "\n";
+  const row = `| 7z-bin@${packageVersion} | 7-Zip@${version} (${date}) |${newline}`;
+  return content.slice(0, position) + row + content.slice(position);
 }
 
 export async function updateBinaries({ root = ROOT, release, download = request, extract = extractArchive } = {}) {

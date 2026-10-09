@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, readFile, rm, writeFile, chmod, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { TARGETS, planRelease, verifyAsset, updateBinaries, getPackageVersion } from "./update-bin.mjs";
+import { TARGETS, planRelease, verifyAsset, updateBinaries, getPackageVersion, updateReadme } from "./update-bin.mjs";
 
 import { verifyBinaryVersion } from "./verify-package.mjs";
 
@@ -28,7 +28,7 @@ const release = () => ({ tag_name: "26.04", published_at: "2026-10-06T07:55:39Z"
 async function fixture(fn) {
   const root = await mkdtemp(join(tmpdir(), "7z-bin-test-"));
   try {
-    await writeFile(join(root, "README.md"), "| 7z-bin@0.0.8 | 7-Zip@24.09 (2024-11-29) |\n");
+    await writeFile(join(root, "README.md"), "## Package Version\n\n| Package | Binary |\n| :--- | :--- |\n| 7z-bin@0.0.8 | 7-Zip@24.09 (2024-11-29) |\n");
     await writeFile(join(root, "package.json"), JSON.stringify({ name: "7z-bin", version: "0.0.8", scripts: { build: "tsdown" } }, null, 2) + "\n");
     await mkdir(join(root, "bin", "mac"), { recursive: true });
     await writeFile(join(root, "bin", "mac", "7zz"), "legacy");
@@ -151,3 +151,28 @@ test("updates package metadata and removes previously installed documentation", 
   assert.equal((await updateBinaries({ root, ...dependencies() })).changed, true);
   assert.equal(JSON.parse(await readFile(join(root, "package.json"), "utf8")).version, "26.4.0");
 }));
+
+test("README version updates prepend a row and preserve history and surrounding sections", () => {
+  for (const newline of ["\n", "\r\n"]) {
+    const history = [
+      "| 7z-bin@0.0.8 | 7-Zip@24.09 (2024-11-29) |",
+      "| 7z-bin@0.0.3 | 7-Zip@24.08 (2024-08-11) |",
+    ].join(newline);
+    const prefix = ["# Package", "", "## Package Version", "", "| Package | Binary |", "| :--- | :--- |", ""].join(newline);
+    const suffix = newline + newline + "## License" + newline + "Unchanged content" + newline;
+    const original = prefix + history + suffix;
+    const row = "| 7z-bin@26.4.0 | 7-Zip@26.04 (2026-10-06) |";
+    const updated = updateReadme(original, "26.04", "2026-10-06");
+    assert.equal(updated, prefix + row + newline + history + suffix);
+    assert.equal(updateReadme(updated, "26.04", "2026-10-07"), updated);
+    assert.throws(() => updateReadme("## License" + newline + history, "26.04", "2026-10-06"));
+    assert.throws(() => updateReadme("## Package Version" + newline + "## License" + newline + history, "26.04", "2026-10-06"));
+  }
+});
+
+test("README does not duplicate an existing version below a newer row", () => {
+  const content = "## Package Version\n\n| Package | Binary |\n| --- | --- |\n" +
+    "| 7z-bin@26.5.0 | 7-Zip@26.05 (2026-11-01) |\n" +
+    "| 7z-bin@26.4.0 | 7-Zip@26.04 (2026-10-06) |\n";
+  assert.equal(updateReadme(content, "26.04", "2026-10-06"), content);
+});

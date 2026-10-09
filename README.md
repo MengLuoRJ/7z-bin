@@ -83,6 +83,31 @@ xz support and a 7-Zip extractor. The workflow detects `7zz` or `7z` after
 installation and passes its absolute path through `SEVEN_ZIP`; the script
 otherwise defaults to `7zz`.
 
+## Manual npm publishing
+
+The **Publish to npm** workflow (`publish-npm.yml`) is manual-only and runs only
+when the selected branch is the repository's default branch. Merge the binary
+update PR first, then open Actions → Publish to npm → Run workflow. Enter the
+exact package.json version (for example `26.4.0`). Leave `dry_run` enabled for a
+trial; run again with it disabled to publish publicly under the `latest` tag.
+It never changes the package version and npm versions cannot be republished.
+
+Configure npm Trusted Publishing for the existing `7z-bin` package on npmjs.com:
+
+- Provider: GitHub Actions
+- Organization or user: `MengLuoRJ`
+- Repository: `7z-bin`
+- Workflow filename: `publish-npm.yml`
+- Environment: leave empty (this workflow does not use a GitHub Environment)
+
+The workflow uses npm 11 and `id-token: write` for OIDC authentication; do not
+add NPM_TOKEN or NODE_AUTH_TOKEN. It tests and builds the package, checks its
+ESM/CJS entries and Linux binary, validates the requested version and bundled
+file hashes, and packs a tarball before publishing that exact archive with
+provenance. A dry-run does not verify the npm publisher authorization, and an
+actual publish still requires a valid Trusted Publisher configuration and an
+unpublished version. See the [npm Trusted Publishing documentation](https://docs.npmjs.com/trusted-publishers/).
+
 ## License
 
 This repository is licensed under the [MIT License](LICENSE).

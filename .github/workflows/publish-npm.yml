@@ -1,0 +1,54 @@
+name: Publish to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Exact package.json version to publish (for example 26.4.0)"
+        required: true
+        type: string
+      dry_run:
+        description: "Validate and pack without publishing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install supported npm and build dependencies
+        run: |
+          npm install --global npm@11 pnpm@9.15.9
+          npm --version
+          pnpm install --frozen-lockfile
+
+      - name: Test and build
+        run: |
+          node --test scripts/update-bin.test.mjs scripts/publish-npm.test.mjs
+          pnpm run build
+
+      - name: Verify bundled binary and package entries
+        run: |
+          VERSION="$(node --input-type=module -e 'import { readFileSync } from "node:fs"; console.log(JSON.parse(readFileSync("bin/version.json", "utf8")).version)')" node scripts/verify-package.mjs
+
+      - name: Pack and publish with npm trusted publishing
+        run: node scripts/publish-npm.mjs
+        env:
+          EXPECTED_VERSION: ${{ inputs.version }}
+          DRY_RUN: ${{ inputs.dry_run }}
